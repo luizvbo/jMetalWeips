@@ -21,52 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.uma.jmetal.algorithm.multiobjective.weips;
+package jmetal.metaheuristics.weips;
 
 import java.util.List;
-import org.uma.jmetal.operator.CrossoverOperator;
-import org.uma.jmetal.operator.MutationOperator;
-import org.uma.jmetal.operator.SelectionOperator;
-import org.uma.jmetal.operator.impl.selection.WeipsTournamentSelection;
-import org.uma.jmetal.problem.Problem;
-import org.uma.jmetal.solution.Solution;
-import org.uma.jmetal.util.evaluator.SolutionListEvaluator;
-import org.uma.jmetal.util.pseudorandom.JMetalRandom;
+import jmetal.metaheuristics.weips.Weips;
+import jmetal.util.PseudoRandom;
 
 /**
  *
  * @author luiz
  */
-public class StratGrips <S extends Solution<?>> extends Weips<S> {
-
-    public StratGrips(int maxEvaluations, 
-                 int populationSize, 
-                 int tournamentSize,
-                 int numberWeights,
-                 Problem<S> problem, 
-                 CrossoverOperator<S> crossoverOperator, 
-                 MutationOperator<S> mutationOperator,
-                 SolutionListEvaluator<S> evaluator){
-        super(maxEvaluations, populationSize, tournamentSize, numberWeights, 
-              problem, crossoverOperator, mutationOperator, evaluator);
+public class StratGrips extends Weips {
+    /**
+     * Constructor
+     * @param problem Problem to solve
+     */
+    public StratGrips(jmetal.core.Problem problem) {
+        super (problem);
     }
 
     @Override
-    protected SelectionOperator<List<S>, S> getSelectionOperator(int numObjectives, 
-                                                                 int numWeights, 
-                                                                 int tournamentSize) {
-        return new WeipsTournamentSelection(buildWeightMatrix(numObjectives, numWeights), tournamentSize);
-    }
-
-    private double[][] buildWeightMatrix(int numObjectives, int numWeights) {
+    protected double[][] getWeightMatrix(int numObjectives, int numWeights) {
         double [][] weightMatrix = new double[numWeights][numObjectives];
-        JMetalRandom random = JMetalRandom.getInstance();
 
         for(int i = 0; i < weightMatrix.length; i++){
             double sum = 0;
             
             for(int j = 0; j < numObjectives; j++){
-                weightMatrix[i][j] = random.nextDouble();
+                weightMatrix[i][j] = PseudoRandom.randDouble();
                 sum += weightMatrix[i][j];
             }
             // Normalize the weights to sum to one

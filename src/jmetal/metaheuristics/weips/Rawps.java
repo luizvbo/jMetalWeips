@@ -23,8 +23,6 @@
  */
 package jmetal.metaheuristics.weips;
 
-import java.util.List;
-import jmetal.core.Operator;
 import jmetal.core.Problem;
 
 /**
@@ -32,7 +30,6 @@ import jmetal.core.Problem;
  * @author luiz
  */
 public class Rawps extends Weips{
-
     /**
      * Constructor
      * @param problem Problem to solve
@@ -42,10 +39,8 @@ public class Rawps extends Weips{
     }
 
     @Override
-    protected Operator getSelectionOperator(int numberOfObjectives, 
-                                            int numberWeights, 
-                                            int tournamentSize) {
-        return new WeipsTournamentSelection(null, tournamentSize);
+    protected double[][] getWeightMatrix(int numberOfObjectives, int numberWeights) {
+        return null;
     }
     
     @Override 
