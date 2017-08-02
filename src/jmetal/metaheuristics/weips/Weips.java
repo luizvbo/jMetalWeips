@@ -1,11 +1,15 @@
 package jmetal.metaheuristics.weips;
 
+import java.util.HashMap;
 import jmetal.core.*;
+import jmetal.operators.selection.Tournament;
 import jmetal.qualityIndicator.QualityIndicator;
 import jmetal.util.Distance;
 import jmetal.util.JMException;
 import jmetal.util.Ranking;
+import jmetal.util.StrictNonDominatedSet;
 import jmetal.util.comparators.CrowdingComparator;
+import jmetal.util.comparators.WeipsComparator;
 
 /**
  *
@@ -18,7 +22,7 @@ public abstract class Weips extends Algorithm {
     public static String p_mutation = "mutation";
     public static String p_crossover = "crossover";
     public static String p_numWeights = "numWeights";
-    public static String p_tournamentSize = "tournamentSize";
+    public static String p_tournamentSize = Tournament.p_tournamentSize;
     
     public static String po_distributionIndex = "distributionIndex";
     public static String po_probability = "probability";
@@ -36,16 +40,25 @@ public abstract class Weips extends Algorithm {
 
     public void build(){
         selectionOperator = getSelectionOperator(problem_.getNumberOfObjectives(),
-                                             ((Integer) getInputParameter(p_numWeights)).intValue(), 
-                                             ((Integer) getInputParameter(p_tournamentSize)).intValue());
+                                             ((Integer) getInputParameter(p_numWeights)).intValue());
     }
     
     public abstract String getName();
     
     public abstract String getDescription();
 
-    protected abstract Operator getSelectionOperator(int numberOfObjectives, 
-                                                     int numberWeights, int tournamentSize);
+    private Operator getSelectionOperator(int numberOfObjectives, 
+                                            int numberWeights) {
+        HashMap  parameters = new HashMap();
+        parameters.put(Tournament.p_tournamentSize, (Integer) getInputParameter(p_tournamentSize)) ;
+        parameters.put(Tournament.p_comparator, new WeipsComparator(getWeightMatrix(numberOfObjectives, numberWeights)));
+        
+        return new Tournament(parameters);
+    }
+    
+    protected abstract double[][] getWeightMatrix(int numberOfObjectives, int numberWeights);
+    
+    
     
     /**   
      * Runs the WeiPS algorithm.
@@ -62,6 +75,9 @@ public abstract class Weips extends Algorithm {
         int requiredEvaluations; // Use in the example of use of the
         // indicators object (see below)
 
+        getSelectionOperator(problem_.getNumberOfObjectives(), 
+                            ((Integer) getInputParameter(p_numWeights)).intValue());
+        
         SolutionSet population;
         SolutionSet offspringPopulation;
         SolutionSet union;
@@ -69,13 +85,12 @@ public abstract class Weips extends Algorithm {
         Operator mutationOperator;
         Operator crossoverOperator;
         
-
         Distance distance = new Distance();
 
         //Read the parameters
-        populationSize = ((Integer) getInputParameter("populationSize")).intValue();
-        maxEvaluations = ((Integer) getInputParameter("maxEvaluations")).intValue();
-        indicators = (QualityIndicator) getInputParameter("indicators");
+        populationSize = ((Integer) getInputParameter(p_populationSize)).intValue();
+        maxEvaluations = ((Integer) getInputParameter(p_maxEvaluations)).intValue();
+        indicators = (QualityIndicator) getInputParameter(p_indicators);
 
         //Initialize the variables
         population = new SolutionSet(populationSize);
@@ -84,8 +99,8 @@ public abstract class Weips extends Algorithm {
         requiredEvaluations = 0;
 
         //Read the operators
-        mutationOperator = operators_.get("mutation");
-        crossoverOperator = operators_.get("crossover");
+        mutationOperator = operators_.get(p_mutation);
+        crossoverOperator = operators_.get(p_crossover);
 
         // Create the initial solutionSet
         Solution newSolution;
@@ -125,16 +140,23 @@ public abstract class Weips extends Algorithm {
             union = ((SolutionSet) population).union(offspringPopulation);
 
             // Ranking the union
-            Ranking ranking = new Ranking(union);
-
-            int remain = populationSize;
-            int index = 0;
+            StrictNonDominatedSet stricNDS = new StrictNonDominatedSet(union);
+            
             SolutionSet front = null;
             population.clear();
 
-            // Obtain the next front
-            front = ranking.getSubfront(index);
-
+            if(stricNDS.getNonDominatedSet().size() < populationSize){
+                for(int k = 0; k < stricNDS.getNonDominatedSet().size(); k++) {
+                    population.add(stricNDS.getNonDominatedSet().get(k));
+                }
+                int remain = populationSize - stricNDS.getNonDominatedSet().size();
+                for(int k = 0; k < remain; k++) {
+                    Solution selected = (Solution) selectionOperator.execute(population);
+                    stricNDS.getNonDominatedSet()
+                    population.add(newSolution)
+                }
+            }
+            
             while ((remain > 0) && (remain >= front.size())) {
                 //Assign crowding distance to individuals
                 distance.crowdingDistanceAssignment(front, problem_.getNumberOfObjectives());

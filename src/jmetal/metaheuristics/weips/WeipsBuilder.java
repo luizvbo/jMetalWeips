@@ -1,14 +1,4 @@
-package org.uma.jmetal.algorithm.multiobjective.weips;
-
-import org.uma.jmetal.operator.CrossoverOperator;
-import org.uma.jmetal.operator.MutationOperator;
-import org.uma.jmetal.operator.SelectionOperator;
-import org.uma.jmetal.problem.Problem;
-import org.uma.jmetal.solution.Solution;
-import org.uma.jmetal.util.AlgorithmBuilder;
-import org.uma.jmetal.util.JMetalException;
-import org.uma.jmetal.util.evaluator.SolutionListEvaluator;
-import org.uma.jmetal.util.evaluator.impl.SequentialSolutionListEvaluator;
+package jmetal.metaheuristics.weips;
 
 import java.util.List;
 
