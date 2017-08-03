@@ -24,14 +24,13 @@
 package jmetal.metaheuristics.weips;
 
 import java.util.List;
-import jmetal.metaheuristics.weips.Weips;
 import jmetal.util.PseudoRandom;
 
 /**
  *
  * @author luiz
  */
-public class StratGrips extends Weips {
+public class StratGrips extends Grips {
     /**
      * Constructor
      * @param problem Problem to solve
@@ -41,19 +40,17 @@ public class StratGrips extends Weips {
     }
 
     @Override
-    protected double[][] getWeightMatrix(int numObjectives, int numWeights) {
-        double [][] weightMatrix = new double[numWeights][numObjectives];
-
-        for(int i = 0; i < weightMatrix.length; i++){
-            double sum = 0;
-            
-            for(int j = 0; j < numObjectives; j++){
-                weightMatrix[i][j] = PseudoRandom.randDouble();
-                sum += weightMatrix[i][j];
+    protected List<double[]> getWeightMatrix(int numObjectives, int numWeights) {
+        List<double[]> weightMatrix = super.getWeightMatrix(numObjectives, numWeights);
+        
+        for(double[] weightArray : weightMatrix) {
+            double sumWeights = 0;
+            for(int i = 0; i< weightArray.length; i++){
+                weightArray[i] *= PseudoRandom.randDouble();
+                sumWeights += weightArray[i];
             }
-            // Normalize the weights to sum to one
-            for(int j = 0; j < numObjectives; j++){
-                weightMatrix[i][j] /= sum;
+            for(int i = 0; i< weightArray.length; i++){
+                weightArray[i] /= sumWeights;
             }
         }
         return weightMatrix;

@@ -23,9 +23,11 @@
  */
 package jmetal.metaheuristics.weips;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import jmetal.core.Problem;
-import jmetal.util.PseudoRandom;
+import jmetal.util.MathUtils;
 
 /**
  *
@@ -41,21 +43,50 @@ public class Grips extends Weips {
     }
 
     @Override
-    protected double[][] getWeightMatrix(int numObjectives, int numWeights) {
-        double [][] weightMatrix = new double[numWeights][numObjectives];
-
-        for(int i = 0; i < weightMatrix.length; i++){
-            double sum = 0;
-            
-            for(int j = 0; j < numObjectives; j++){
-                weightMatrix[i][j] = PseudoRandom.randDouble();
-                sum += weightMatrix[i][j];
+    protected List<double[]> getWeightMatrix(int numObjectives, int numWeights) {
+        List<double[]> weightMatrix = new ArrayList<>();
+        double[] coordinates = MathUtils.range(0, 1, numWeights);
+        // Index currently adjusted
+        int[] currentIndex = new int[numObjectives];
+        currentIndex[numObjectives - 1] = numWeights - 1;
+        // Maximum index allowed per dimension (ensures the weights sum to one)
+        int[] maxIndex = new int[numObjectives - 1];
+        Arrays.fill(maxIndex, numWeights - 1);
+        
+        while(currentIndex[0] <= maxIndex[0]){
+            double[] tmpWeight = new double[numObjectives];
+            // Concatenate the weights and append to the matrix
+            for(int i = 0; i < numObjectives; i++){
+                tmpWeight[i] = coordinates[currentIndex[i]];
             }
-            // Normalize the weights to sum to one
-            for(int j = 0; j < numObjectives; j++){
-                weightMatrix[i][j] /= sum;
+            weightMatrix.add(tmpWeight);
+            // Increment the last but one index
+            currentIndex[numObjectives-2] += 1;
+            // Check if we need to adjust the index of other coordinates
+            for(int i = numObjectives - 2; i > 0; i--){
+                // If we get the maxIndex, we recursively add one to the next dimension
+                if(currentIndex[i] > maxIndex[i]){
+                    currentIndex[i] = 0;
+                    currentIndex[i-1] += 1;
+                    if(currentIndex[i-1] <= maxIndex[i-1]){
+                        int summation = 0;
+                        for(int j = 0; j < i; j++){
+                            summation += currentIndex[j];
+                        }
+                        for(int j = i; j < numObjectives -1; j++){
+                            maxIndex[j] = numWeights - summation - 1;
+                        }
+                    }
+                }
+                else{
+                    break;
+                }
             }
+            // The index of the last coordinate is simetric to the last but one
+            currentIndex[numObjectives - 1] = maxIndex[numObjectives - 2] - 
+                                               currentIndex[numObjectives - 2];
         }
+        
         return weightMatrix;
     }
     
