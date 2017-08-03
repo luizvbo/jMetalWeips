@@ -88,8 +88,14 @@ public class Tournament extends Selection {
         return candidates.best(comparator_);
     } 
     
-    public Solution noReplacementTournament(int tournamentSize, List<Solution> solutionList) throws JMException{
-        tournamentSize = Math.min(tournamentSize, solutionList.size());
+    /**
+     * Selects one solution from the input solution set using a tournament of size 
+     * <code>tournamentSize</code> and then remove it from the set
+     * @param solutionList List of solutions used as input for the tournment
+     * @return The winner of the tournment
+     */
+    public Solution noReplacementTournament(List<Solution> solutionList) {
+        int tournamentSize = Math.min(this.tournamentSize, solutionList.size());
         
         Integer[] candIndexes = SolutionListUtils.
                                     selectNRandomDifferentPostions(tournamentSize, solutionList.size()).
@@ -105,8 +111,9 @@ public class Tournament extends Selection {
             candSolutions.add(solutionList.get(candIndexes[i]));
         }
                 
-        candSolutions.best(comparator_);
+        Solution selectedSol = candSolutions.best(comparator_);
+        solutionList.remove(selectedSol);
         
-        return candidates.best(comparator_);
+        return selectedSol;
     }
 } 

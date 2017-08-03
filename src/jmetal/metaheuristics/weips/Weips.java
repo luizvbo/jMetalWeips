@@ -28,7 +28,7 @@ public abstract class Weips extends Algorithm {
     public static String po_probability = "probability";
 //    public static String p_ = "";
     
-    protected Operator selectionOperator = null;
+    protected Tournament tournmentSelOperator = null;
     
     /**
      * Constructor
@@ -39,7 +39,7 @@ public abstract class Weips extends Algorithm {
     }
 
     public void build(){
-        selectionOperator = getSelectionOperator(problem_.getNumberOfObjectives(),
+        tournmentSelOperator = getTournmentSelOperator(problem_.getNumberOfObjectives(),
                                              ((Integer) getInputParameter(p_numWeights)).intValue());
     }
     
@@ -47,7 +47,7 @@ public abstract class Weips extends Algorithm {
     
     public abstract String getDescription();
 
-    private Operator getSelectionOperator(int numberOfObjectives, 
+    private Tournament getTournmentSelOperator(int numberOfObjectives, 
                                             int numberWeights) {
         HashMap  parameters = new HashMap();
         parameters.put(Tournament.p_tournamentSize, (Integer) getInputParameter(p_tournamentSize)) ;
@@ -67,6 +67,8 @@ public abstract class Weips extends Algorithm {
      * @throws JMException 
      */
     public SolutionSet execute() throws JMException, ClassNotFoundException {
+        build();
+        
         int populationSize;
         int maxEvaluations;
         int evaluations;
@@ -74,9 +76,6 @@ public abstract class Weips extends Algorithm {
         QualityIndicator indicators; // QualityIndicator object
         int requiredEvaluations; // Use in the example of use of the
         // indicators object (see below)
-
-        getSelectionOperator(problem_.getNumberOfObjectives(), 
-                            ((Integer) getInputParameter(p_numWeights)).intValue());
         
         SolutionSet population;
         SolutionSet offspringPopulation;
@@ -121,8 +120,8 @@ public abstract class Weips extends Algorithm {
             for (int i = 0; i < (populationSize / 2); i++) {
                 if (evaluations < maxEvaluations) {
                     //obtain parents
-                    parents[0] = (Solution) selectionOperator.execute(population);
-                    parents[1] = (Solution) selectionOperator.execute(population);
+                    parents[0] = (Solution) tournmentSelOperator.execute(population);
+                    parents[1] = (Solution) tournmentSelOperator.execute(population);
                     Solution[] offSpring = (Solution[]) crossoverOperator.execute(parents);
                     mutationOperator.execute(offSpring[0]);
                     mutationOperator.execute(offSpring[1]);
@@ -151,49 +150,19 @@ public abstract class Weips extends Algorithm {
                 }
                 int remain = populationSize - stricNDS.getNonDominatedSet().size();
                 for(int k = 0; k < remain; k++) {
-                    Solution selected = (Solution) selectionOperator.execute(stricNDS.getDominatedSet());
-                    stricNDS.getDominatedSet().;
-                    population.add(newSolution)
+                    Solution selected = tournmentSelOperator.noReplacementTournament(stricNDS.getDominatedSet());
+                    population.add(selected);
                 }
             }
-            
-            while ((remain > 0) && (remain >= front.size())) {
-                //Assign crowding distance to individuals
-                distance.crowdingDistanceAssignment(front, problem_.getNumberOfObjectives());
-                //Add the individuals of this front
-                for (int k = 0; k < front.size(); k++) {
-                    population.add(front.get(k));
-                } // for
-
-                //Decrement remain
-                remain = remain - front.size();
-
-                //Obtain the next front
-                index++;
-                if (remain > 0) {
-                    front = ranking.getSubfront(index);
-                }         
-            } 
-
-            // Remain is less than front(index).size, insert only the best one
-            if (remain > 0) {  // front contains individuals to insert                        
-                distance.crowdingDistanceAssignment(front, problem_.getNumberOfObjectives());
-                front.sort(new CrowdingComparator());
-                for (int k = 0; k < remain; k++) {
-                    population.add(front.get(k));
-                } 
-
-                remain = 0;
-            }                                
-
-            // This piece of code shows how to use the indicator object into the code
-            // of NSGA-II. In particular, it finds the number of evaluations required
-            // by the algorithm to obtain a Pareto front with a hypervolume higher
-            // than the hypervolume of the true Pareto front.
-            if ((indicators != null) && (requiredEvaluations == 0)) {
-                double HV = indicators.getHypervolume(population);
-                if (HV >= (0.98 * indicators.getTrueParetoFrontHypervolume())) {
-                    requiredEvaluations = evaluations;
+            else if(stricNDS.getNonDominatedSet().size() > populationSize){
+                for(int k = 0; k < populationSize; k++){
+                    Solution selected = tournmentSelOperator.noReplacementTournament(stricNDS.getNonDominatedSet());
+                    population.add(selected);
+                }
+            }
+            else{
+                for(int k = 0; k < stricNDS.getNonDominatedSet().size(); k++) {
+                    population.add(stricNDS.getNonDominatedSet().get(k));
                 }
             }
         }

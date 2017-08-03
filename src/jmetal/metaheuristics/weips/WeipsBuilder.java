@@ -1,159 +1,125 @@
 package jmetal.metaheuristics.weips;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import jmetal.core.Algorithm;
+import jmetal.core.Operator;
+import jmetal.core.Problem;
+import jmetal.core.SolutionSet;
+import jmetal.operators.crossover.CrossoverFactory;
+import jmetal.operators.mutation.MutationFactory;
+import jmetal.problems.ProblemFactory;
+import jmetal.problems.ZDT.ZDT3;
+import jmetal.qualityIndicator.QualityIndicator;
+import jmetal.util.Configuration;
+import jmetal.util.JMException;
 
 
 /**
  *
  * @author Luiz Otavio V. B. Oliveira <luiz.vbo@gmail.com>
  */
-public class WeipsBuilder<S extends Solution<?>> implements AlgorithmBuilder<Weips<S>> {
+public class WeipsBuilder{
     public enum WeipsVariant {Rawps, Unpas, Grips, StratGrips}
 
-    /**
-    * WeipsBuilder class
-    */
-    private final Problem<S> problem;
-    private int maxEvaluations;
-    private int populationSize;
-    private int tournamentSize;
-    private int numberWeights;
-    private CrossoverOperator<S>  crossoverOperator;
-    private MutationOperator<S> mutationOperator;
-    private SelectionOperator<List<S>, S> selectionOperator;
-    private SolutionListEvaluator<S> evaluator;
-
-    private WeipsVariant variant;
+    public static Logger      logger_ ;      // Logger object
+    public static FileHandler fileHandler_ ; // FileHandler object
 
     /**
-    * WeipsBuilder constructor
+    * @param args Command line arguments.
+    * @throws JMException 
+    * @throws IOException 
+    * @throws SecurityException 
+    * Usage: three options
+    *      - jmetal.metaheuristics.nsgaII.NSGAII_main
+    *      - jmetal.metaheuristics.nsgaII.NSGAII_main problemName
+    *      - jmetal.metaheuristics.nsgaII.NSGAII_main problemName paretoFrontFile
     */
-    public WeipsBuilder(Problem<S> problem, CrossoverOperator<S> crossoverOperator,
-                        MutationOperator<S> mutationOperator) {
-        this.problem = problem;
-        maxEvaluations = 25000;
-        populationSize = 100;
-        tournamentSize = 5;
-        numberWeights = populationSize;
-        this.crossoverOperator = crossoverOperator ;
-        this.mutationOperator = mutationOperator ;
-        evaluator = new SequentialSolutionListEvaluator<S>();
+    public static void main(String [] args) throws JMException, SecurityException, 
+                                                    IOException, ClassNotFoundException {
+        Problem   problem   ; // The problem to solve
+        Algorithm algorithm ; // The algorithm to use
+        Operator  crossover ; // Crossover operator
+        Operator  mutation  ; // Mutation operator
 
-        this.variant = WeipsVariant.Rawps ;
-    }
+        HashMap  parameters ; // Operator parameters
 
-    public WeipsBuilder<S> setMaxEvaluations(int maxEvaluations) {
-        if (maxEvaluations < 0) {
-            throw new JMetalException("maxEvaluations is negative: " + maxEvaluations);
-        }
-        this.maxEvaluations = maxEvaluations;
+        QualityIndicator indicators ; // Object to get quality indicators
 
-        return this;
-    }
+        // Logger object and file to store log messages
+        logger_      = Configuration.logger_ ;
+        fileHandler_ = new FileHandler("NSGAII_main.log"); 
+        logger_.addHandler(fileHandler_) ;
 
-    public WeipsBuilder<S> setPopulationSize(int populationSize) {
-        if (populationSize < 0) {
-            throw new JMetalException("Population size is negative: " + populationSize);
-        }
-
-        this.populationSize = populationSize;
-
-        return this;
-    }
-    
-    public WeipsBuilder<S> setTournamentSize(int tournamentSize) {
-        if (tournamentSize < 2) {
-            throw new JMetalException("Tournament size should be greater than 1. Value " +
-                                      tournamentSize + " was found instead.");
+        indicators = null ;
+        if (args.length == 1) {
+            Object [] params = {"Real"};
+            problem = (new ProblemFactory()).getProblem(args[0],params);
+        } // if
+        else if (args.length == 2) {
+            Object [] params = {"Real"};
+            problem = (new ProblemFactory()).getProblem(args[0],params);
+            indicators = new QualityIndicator(problem, args[1]) ;
+        } // if
+        else { // Default problem
+            //problem = new Kursawe("Real", 3);
+            //problem = new Kursawe("BinaryReal", 3);
+            //problem = new Water("Real");
+            problem = new ZDT3("ArrayReal", 30);
+            //problem = new ConstrEx("Real");
+            //problem = new DTLZ1("Real");
+            //problem = new OKA2("Real") ;
         }
 
-        this.tournamentSize = tournamentSize;
+        algorithm = new NSGAII(problem);
+        //algorithm = new ssNSGAII(problem);
 
-        return this;
-    }
-    
-    public WeipsBuilder<S> setNumberWeights(int numberWeights) {
-        if (numberWeights < 1) {
-            throw new JMetalException("Number of weights is smaller than 1: " + numberWeights);
-        }
+        // Algorithm parameters
+        algorithm.setInputParameter("populationSize",100);
+        algorithm.setInputParameter("maxEvaluations",25000);
 
-        this.numberWeights = numberWeights;
+        // Mutation and Crossover for Real codification 
+        parameters = new HashMap() ;
+        parameters.put("probability", 0.9) ;
+        parameters.put("distributionIndex", 20.0) ;
+        crossover = CrossoverFactory.getCrossoverOperator("SBXCrossover", parameters);                   
 
-        return this;
-    }
+        parameters = new HashMap() ;
+        parameters.put("probability", 1.0/problem.getNumberOfVariables()) ;
+        parameters.put("distributionIndex", 20.0) ;
+        mutation = MutationFactory.getMutationOperator("PolynomialMutation", parameters);                    
 
-    public WeipsBuilder<S> setSolutionListEvaluator(SolutionListEvaluator<S> evaluator) {
-        if (evaluator == null) {
-            throw new JMetalException("evaluator is null");
-        }
-        this.evaluator = evaluator;
+        // Add the operators to the algorithm
+        algorithm.addOperator("crossover",crossover);
+        algorithm.addOperator("mutation",mutation);
 
-        return this;
-    }
+        // Add the indicator object to the algorithm
+        algorithm.setInputParameter("indicators", indicators) ;
 
+        // Execute the Algorithm
+        long initTime = System.currentTimeMillis();
+        SolutionSet population = algorithm.execute();
+        long estimatedTime = System.currentTimeMillis() - initTime;
 
-    public WeipsBuilder<S> setVariant(WeipsVariant variant) {
-        this.variant = variant;
+        // Result messages 
+        logger_.info("Total execution time: "+estimatedTime + "ms");
+        logger_.info("Variables values have been writen to file VAR");
+        population.printVariablesToFile("VAR");    
+        logger_.info("Objectives values have been writen to file FUN");
+        population.printObjectivesToFile("FUN");
 
-        return this;
-    }
+        if (indicators != null) {
+            logger_.info("Quality indicators") ;
+            logger_.info("Hypervolume: " + indicators.getHypervolume(population)) ;
+            logger_.info("GD         : " + indicators.getGD(population)) ;
+            logger_.info("IGD        : " + indicators.getIGD(population)) ;
+            logger_.info("Spread     : " + indicators.getSpread(population)) ;
+            logger_.info("Epsilon    : " + indicators.getEpsilon(population)) ;  
 
-    @Override
-    public Weips<S> build() {
-        Weips<S> algorithm = null ;
-
-        // Equivalent to the Rawps initialization
-        double[][] weightMatrix = null;
-        switch (variant) {
-            case Rawps:
-                algorithm = new Rawps(maxEvaluations, populationSize, tournamentSize, numberWeights,
-                        problem, crossoverOperator, mutationOperator, evaluator);
-                break;
-            case Unpas:
-                algorithm = new Unpas(maxEvaluations, populationSize, tournamentSize, numberWeights,
-                        problem, crossoverOperator, mutationOperator, evaluator);
-                break;
-            case Grips:
-                algorithm = new Grips(maxEvaluations, populationSize, tournamentSize, numberWeights,
-                        problem, crossoverOperator, mutationOperator, evaluator);
-                break;
-            case StratGrips:
-                algorithm = new StratGrips(maxEvaluations, populationSize, tournamentSize, numberWeights,
-                        problem, crossoverOperator, mutationOperator, evaluator);
-                break;
-            default:
-                break;
-        }
-
-        return algorithm;
-    }
-    
-    /* Getters */
-    public Problem<S> getProblem() {
-        return problem;
-    }
-
-    public int getMaxIterations() {
-        return maxEvaluations;
-    }
-
-    public int getPopulationSize() {
-        return populationSize;
-    }
-
-    public CrossoverOperator<S> getCrossoverOperator() {
-        return crossoverOperator;
-    }
-
-    public MutationOperator<S> getMutationOperator() {
-        return mutationOperator;
-    }
-
-    public SelectionOperator<List<S>, S> getSelectionOperator() {
-        return selectionOperator;
-    }
-
-    public SolutionListEvaluator<S> getSolutionListEvaluator() {
-        return evaluator;
-    }
-}
+            int evaluations = ((Integer)algorithm.getOutputParameter("evaluations")).intValue();
+            logger_.info("Speed      : " + evaluations + " evaluations") ;      
+        } 
+    } 
+} 
