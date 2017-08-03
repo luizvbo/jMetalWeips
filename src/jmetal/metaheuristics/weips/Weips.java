@@ -151,8 +151,8 @@ public abstract class Weips extends Algorithm {
                 }
                 int remain = populationSize - stricNDS.getNonDominatedSet().size();
                 for(int k = 0; k < remain; k++) {
-                    Solution selected = (Solution) selectionOperator.execute(population);
-                    stricNDS.getNonDominatedSet()
+                    Solution selected = (Solution) selectionOperator.execute(stricNDS.getDominatedSet());
+                    stricNDS.getDominatedSet().;
                     population.add(newSolution)
                 }
             }

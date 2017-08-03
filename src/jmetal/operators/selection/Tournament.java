@@ -21,12 +21,14 @@
 
 package jmetal.operators.selection;
 
+import java.util.Collection;
 import jmetal.core.SolutionSet;
-import jmetal.util.PseudoRandom;
 import jmetal.util.comparators.DominanceComparator;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import jmetal.core.Solution;
 import jmetal.util.JMException;
 import jmetal.util.SolutionListUtils;
 
@@ -72,6 +74,7 @@ public class Tournament extends Selection {
      * Performs the operation
      * @param object Object representing a SolutionSet
      * @return the selected solution
+     * @throws jmetal.util.JMException
      */
     @Override
     public Object execute(Object object) throws JMException{
@@ -84,4 +87,26 @@ public class Tournament extends Selection {
         
         return candidates.best(comparator_);
     } 
+    
+    public Solution noReplacementTournament(int tournamentSize, List<Solution> solutionList) throws JMException{
+        tournamentSize = Math.min(tournamentSize, solutionList.size());
+        
+        Integer[] candIndexes = SolutionListUtils.
+                                    selectNRandomDifferentPostions(tournamentSize, solutionList.size()).
+                                    toArray(new Integer[tournamentSize]);
+        
+        if (candIndexes.length == 1) {
+            solutionList.remove((int)candIndexes[0]);
+            return solutionList.get(candIndexes[0]);
+        }
+        
+        SolutionSet candSolutions = new SolutionSet(tournamentSize);
+        for(int i = 0; i < candIndexes.length; i++){
+            candSolutions.add(solutionList.get(candIndexes[i]));
+        }
+                
+        candSolutions.best(comparator_);
+        
+        return candidates.best(comparator_);
+    }
 } 

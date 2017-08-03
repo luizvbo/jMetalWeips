@@ -21,12 +21,14 @@
 
 package jmetal.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import jmetal.core.SolutionSet;
 import jmetal.util.comparators.DominanceComparator;
 import jmetal.util.comparators.OverallConstraintViolationComparator;
 
 import java.util.Comparator;
+import java.util.List;
 import jmetal.core.Solution;
 
 /**
@@ -41,10 +43,10 @@ import jmetal.core.Solution;
 public class StrictNonDominatedSet {
     
     // Set of strictly non-dominated solutions
-    private SolutionSet nonDominatedSet;
+    private List<Solution> nonDominatedSet;
     
     // Set of strictly dominated solutions
-    private SolutionSet dominatedSet;
+    private List<Solution> dominatedSet;
 
     /** 
      * Constructor.
@@ -57,8 +59,8 @@ public class StrictNonDominatedSet {
         // Comparator for Overal Constraint Violation Comparator
         Comparator constraint_ = new OverallConstraintViolationComparator();
 
-        dominatedSet = new SolutionSet(); 
-        nonDominatedSet = new SolutionSet();
+        dominatedSet = new ArrayList<>();
+        nonDominatedSet = new ArrayList<>();
         
         /**
          * The dominance array stores the dominance situation of each solution.
@@ -120,14 +122,14 @@ public class StrictNonDominatedSet {
     /**
      * @return the nonDominatedSet
      */
-    public SolutionSet getNonDominatedSet() {
+    public List<Solution> getNonDominatedSet() {
         return nonDominatedSet;
     }
 
     /**
      * @return the dominatedSet
      */
-    public SolutionSet getDominatedSet() {
+    public List<Solution> getDominatedSet() {
         return dominatedSet;
     }
 } 
