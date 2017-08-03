@@ -23,6 +23,7 @@
  */
 package jmetal.metaheuristics.weips;
 
+import java.util.List;
 import jmetal.core.Problem;
 
 /**
@@ -39,7 +40,7 @@ public class Rawps extends Weips{
     }
 
     @Override
-    protected double[][] getWeightMatrix(int numberOfObjectives, int numberWeights) {
+    protected List<double[]> getWeightMatrix(int numberOfObjectives, int numberWeights) {
         return null;
     }
     

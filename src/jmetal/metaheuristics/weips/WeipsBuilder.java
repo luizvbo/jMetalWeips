@@ -50,7 +50,7 @@ public class WeipsBuilder{
 
         // Logger object and file to store log messages
         logger_      = Configuration.logger_ ;
-        fileHandler_ = new FileHandler("NSGAII_main.log"); 
+        fileHandler_ = new FileHandler("Unpas_main.log"); 
         logger_.addHandler(fileHandler_) ;
 
         indicators = null ;
@@ -73,8 +73,7 @@ public class WeipsBuilder{
             //problem = new OKA2("Real") ;
         }
 
-        algorithm = new Rawps(problem);
-        //algorithm = new ssNSGAII(problem);
+        algorithm = new Grips(problem);
 
         // Algorithm parameters
         algorithm.setInputParameter("populationSize",100);

@@ -1,6 +1,7 @@
 package jmetal.metaheuristics.weips;
 
 import java.util.HashMap;
+import java.util.List;
 import jmetal.core.*;
 import jmetal.operators.selection.Tournament;
 import jmetal.qualityIndicator.QualityIndicator;
@@ -8,7 +9,6 @@ import jmetal.util.Distance;
 import jmetal.util.JMException;
 import jmetal.util.Ranking;
 import jmetal.util.StrictNonDominatedSet;
-import jmetal.util.comparators.CrowdingComparator;
 import jmetal.util.comparators.WeipsComparator;
 
 /**
@@ -56,7 +56,7 @@ public abstract class Weips extends Algorithm {
         return new Tournament(parameters);
     }
     
-    protected abstract double[][] getWeightMatrix(int numberOfObjectives, int numberWeights);
+    protected abstract List<double[]> getWeightMatrix(int numberOfObjectives, int numberWeights);
     
     
     

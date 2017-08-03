@@ -1,6 +1,7 @@
 package jmetal.util.comparators;
 
 import java.util.Comparator;
+import java.util.List;
 import jmetal.core.Solution;
 import jmetal.util.PseudoRandom;
 
@@ -12,15 +13,15 @@ import jmetal.util.PseudoRandom;
 @SuppressWarnings("serial")
 public class WeipsComparator implements Comparator {
     IConstraintViolationComparator violationConstraintComparator_ ;
-    private double[][] weightMatrix;
+    private List<double[]> weightMatrix;
 
     /** Constructor */
-    public WeipsComparator(double[][] weightMatrix) {
+    public WeipsComparator(List<double[]> weightMatrix) {
         this(new OverallConstraintViolationComparator(), weightMatrix) ;
     }
 
     /** Constructor */
-    public WeipsComparator(IConstraintViolationComparator constraintComparator, double[][] weightMatrix) {
+    public WeipsComparator(IConstraintViolationComparator constraintComparator, List<double[]> weightMatrix) {
         violationConstraintComparator_ = constraintComparator ;
         this.weightMatrix = weightMatrix;
     }
@@ -103,6 +104,6 @@ public class WeipsComparator implements Comparator {
             return weightVector;
         }
         // Otherwise randomly select a row from the matrix
-        return weightMatrix[PseudoRandom.randInt(0, weightMatrix.length - 1)];
+        return weightMatrix.get(PseudoRandom.randInt(0, weightMatrix.size() - 1));
     }
 }

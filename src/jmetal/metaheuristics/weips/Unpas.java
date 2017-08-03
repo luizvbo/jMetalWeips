@@ -23,6 +23,8 @@
  */
 package jmetal.metaheuristics.weips;
 
+import java.util.ArrayList;
+import java.util.List;
 import jmetal.core.Problem;
 import jmetal.util.PseudoRandom;
 
@@ -40,20 +42,21 @@ public class Unpas extends Weips {
     }
 
     @Override
-    protected double[][] getWeightMatrix(int numObjectives, int numWeights) {
-        double [][] weightMatrix = new double[numWeights][numObjectives];
+    protected List<double[]> getWeightMatrix(int numObjectives, int numWeights) {
+        List<double[]> weightMatrix = new ArrayList<>(numWeights);
 
-        for(int i = 0; i < weightMatrix.length; i++){
+        for(int i = 0; i < numWeights; i++){
             double sum = 0;
-            
+            double[] weightArray = new double[numObjectives];
             for(int j = 0; j < numObjectives; j++){
-                weightMatrix[i][j] = PseudoRandom.randDouble();
-                sum += weightMatrix[i][j];
+                weightArray[j] = PseudoRandom.randDouble();
+                sum += weightArray[j];
             }
             // Normalize the weights to sum to one
             for(int j = 0; j < numObjectives; j++){
-                weightMatrix[i][j] /= sum;
+                weightArray[j] /= sum;
             }
+            weightMatrix.add(weightArray);
         }
         return weightMatrix;
     }
