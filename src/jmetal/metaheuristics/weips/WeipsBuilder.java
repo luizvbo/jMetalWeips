@@ -73,12 +73,13 @@ public class WeipsBuilder{
             //problem = new OKA2("Real") ;
         }
 
-        algorithm = new NSGAII(problem);
+        algorithm = new Rawps(problem);
         //algorithm = new ssNSGAII(problem);
 
         // Algorithm parameters
         algorithm.setInputParameter("populationSize",100);
         algorithm.setInputParameter("maxEvaluations",25000);
+        algorithm.setInputParameter(Weips.p_numWeights, 100);
 
         // Mutation and Crossover for Real codification 
         parameters = new HashMap() ;
