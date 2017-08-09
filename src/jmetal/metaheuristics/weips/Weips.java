@@ -179,7 +179,7 @@ public abstract class Weips extends Algorithm {
 
         // Return the first non-dominated front
         Ranking ranking = new Ranking(population);
-        ranking.getSubfront(0).printFeasibleFUN("FUN" + getName()) ;
+        ranking.getSubfront(0).printFeasibleFUN("FUN_" + getName()) ;
 
         return ranking.getSubfront(0);
     } 
