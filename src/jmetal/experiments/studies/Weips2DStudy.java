@@ -131,7 +131,7 @@ public class Weips2DStudy extends Experiment {
         exp.initExperiment();
 
         // Run the experiments
-        int numberOfThreads = 6;
+        int numberOfThreads = Runtime.getRuntime().availableProcessors();
         exp.runExperiment(numberOfThreads) ;
 
         exp.generateQualityIndicators() ;
