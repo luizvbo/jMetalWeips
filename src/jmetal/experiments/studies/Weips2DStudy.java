@@ -91,8 +91,13 @@ public class Weips2DStudy extends Experiment {
      * @throws IOException
      */
     public static void main(String[] args) throws JMException, IOException {
-
-        String ouputDir = "/home/luiz/Dados/Trabalho/Pesquisa/Publicacoes/2017/MOGP/results/jmetal/";
+        String ouputDir;
+        
+        if(args.length == 1){
+            ouputDir = args[0];
+        }
+        else
+            ouputDir = "/home/luiz/Dados/Trabalho/Pesquisa/Publicacoes/2017/MOGP/results/jmetal/";
         
         // Logger object and file to store log messages
         logger_      = Configuration.logger_ ;
@@ -131,7 +136,7 @@ public class Weips2DStudy extends Experiment {
         exp.initExperiment();
 
         // Run the experiments
-        int numberOfThreads = Runtime.getRuntime().availableProcessors();
+        int numberOfThreads = Runtime.getRuntime().availableProcessors() * 2;
         exp.runExperiment(numberOfThreads) ;
 
         exp.generateQualityIndicators() ;
