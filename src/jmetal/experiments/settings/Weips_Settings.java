@@ -85,8 +85,10 @@ public class Weips_Settings extends Settings {
         
         weipsMethod_ = weipsMethod;
         tournamentSize_ = 3;
-//        if(weipsMethod == eWeipsMethod.GRIPS || weipsMethod == eWeipsMethod.STRATGRIPS)
-//            numWeights_ =
+        if(problem_.getNumberOfObjectives() == 3 &&
+                (weipsMethod == eWeipsMethod.GRIPS || weipsMethod == eWeipsMethod.STRATGRIPS))
+            // This value ensures the number of weights is 300
+            numWeights_ = 24;
         numWeights_ = populationSize_; 
     } 
 
