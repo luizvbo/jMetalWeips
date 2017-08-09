@@ -141,21 +141,28 @@ public abstract class Weips extends Algorithm {
             // Ranking the union
             StrictNonDominatedSet stricNDS = new StrictNonDominatedSet(union);
             
-            SolutionSet front = null;
+            int remain = populationSize;
             population.clear();
 
-            if(stricNDS.getNonDominatedSet().size() < populationSize){
+            if(stricNDS.getNonDominatedSet().size() < remain){
                 for(int k = 0; k < stricNDS.getNonDominatedSet().size(); k++) {
                     population.add(stricNDS.getNonDominatedSet().get(k));
                 }
-                int remain = populationSize - stricNDS.getNonDominatedSet().size();
+                remain -= stricNDS.getNonDominatedSet().size();
                 for(int k = 0; k < remain; k++) {
                     Solution selected = tournmentSelOperator.noReplacementTournament(stricNDS.getDominatedSet());
                     population.add(selected);
                 }
             }
             else if(stricNDS.getNonDominatedSet().size() > populationSize){
-                for(int k = 0; k < populationSize; k++){
+                // Add the extremes of the PF                
+                for(int k = 0; k < remain && k < problem_.getNumberOfObjectives(); k++) {
+                    Solution selected = getBestSolutionAtObjective(stricNDS.getNonDominatedSet(), k);
+                    stricNDS.getNonDominatedSet().remove(selected);
+                    population.add(selected);
+                    remain--;
+                }
+                for(int k = 0; k < remain; k++){
                     Solution selected = tournmentSelOperator.noReplacementTournament(stricNDS.getNonDominatedSet());
                     population.add(selected);
                 }
@@ -172,8 +179,20 @@ public abstract class Weips extends Algorithm {
 
         // Return the first non-dominated front
         Ranking ranking = new Ranking(population);
-        ranking.getSubfront(0).printFeasibleFUN("FUN_NSGAII") ;
+        ranking.getSubfront(0).printFeasibleFUN("FUN" + getName()) ;
 
         return ranking.getSubfront(0);
     } 
+
+    private Solution getBestSolutionAtObjective(List<Solution> solutionList, int objDim) {
+        Solution bestSolution = null;
+        double min = Double.MAX_VALUE;
+        for(Solution solution : solutionList){
+            if(solution.getObjective(objDim) < min){
+                min = solution.getObjective(objDim);
+                bestSolution = solution;
+            }
+        }
+        return bestSolution;
+    }
 }
