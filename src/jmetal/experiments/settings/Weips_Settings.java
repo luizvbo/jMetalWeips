@@ -95,7 +95,7 @@ public class Weips_Settings extends Settings {
 
     /**
      * Configure Weips with default parameter experiments.settings
-     * @return A NSGAII algorithm object
+     * @return A Weips algorithm object
      * @throws jmetal.util.JMException
      */
     @Override
@@ -106,11 +106,6 @@ public class Weips_Settings extends Settings {
         Mutation   mutation  ;
 
         HashMap  parameters ; // Operator parameters
-
-        // Creating the algorithm. There are two choices: NSGAII and its steady-
-        // state variant ssNSGAII
-//        algorithm = new NSGAII(problem_) ;
-        //algorithm = new ssNSGAII(problem_) ;
         
         switch(weipsMethod_){
             case GRIPS:
@@ -159,28 +154,45 @@ public class Weips_Settings extends Settings {
     } 
 
     /**
-     * Configure NSGAII with user-defined parameter experiments.settings
-     * @return A NSGAII algorithm object
+     * Configure Weips with user-defined parameter experiments.settings
+     * @return A Weips algorithm object
      */
     @Override
     public Algorithm configure(Properties configuration) throws JMException {
         Algorithm algorithm ;
-        Selection  selection ;
         Crossover  crossover ;
         Mutation   mutation  ;
 
         HashMap  parameters ; // Operator parameters
 
-        // Creating the algorithm. There are two choices: NSGAII and its steady-
-        // state variant ssNSGAII
-        algorithm = new NSGAII(problem_) ;
-        //algorithm = new ssNSGAII(problem_) ;
+        switch(weipsMethod_){
+            case GRIPS:
+                algorithm = new Grips(problem_);
+                break;
+            case RAWPS:
+                algorithm = new Rawps(problem_);
+                break;
+            case STRATGRIPS:
+                algorithm = new StratGrips(problem_);
+                break;
+            case UNPAS:
+                algorithm = new Unpas(problem_);
+                break;
+            default:
+                algorithm = new Rawps(problem_);
+                break;  
+        }
 
         // Algorithm parameters
         populationSize_ = Integer.parseInt(configuration.getProperty("populationSize",String.valueOf(populationSize_)));
         maxEvaluations_  = Integer.parseInt(configuration.getProperty("maxEvaluations",String.valueOf(maxEvaluations_)));
-        algorithm.setInputParameter("populationSize",populationSize_);
-        algorithm.setInputParameter("maxEvaluations",maxEvaluations_);
+        algorithm.setInputParameter("populationSize", populationSize_);
+        algorithm.setInputParameter("maxEvaluations", maxEvaluations_);
+        
+        numWeights_ = Integer.parseInt(configuration.getProperty(Weips.p_numWeights, String.valueOf(numWeights_)));
+        tournamentSize_ = Integer.parseInt(configuration.getProperty(Weips.p_tournamentSize, String.valueOf(tournamentSize_)));
+        algorithm.setInputParameter(Weips.p_numWeights, numWeights_);
+        algorithm.setInputParameter(Weips.p_tournamentSize, tournamentSize_);
 
         // Mutation and Crossover for Real codification
         crossoverProbability_ = Double.parseDouble(configuration.getProperty("crossoverProbability",String.valueOf(crossoverProbability_)));
@@ -197,14 +209,9 @@ public class Weips_Settings extends Settings {
         parameters.put("distributionIndex", mutationDistributionIndex_) ;
         mutation = MutationFactory.getMutationOperator("PolynomialMutation", parameters);
 
-        // Selection Operator
-        parameters = null ;
-        selection = SelectionFactory.getSelectionOperator("BinaryTournament2", parameters) ;
-
         // Add the operators to the algorithm
         algorithm.addOperator("crossover",crossover);
         algorithm.addOperator("mutation",mutation);
-        algorithm.addOperator("selection",selection);
 
         return algorithm ;
     }
