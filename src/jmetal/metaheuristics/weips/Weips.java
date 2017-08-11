@@ -23,12 +23,13 @@ public abstract class Weips extends Algorithm {
     public static String p_crossover = "crossover";
     public static String p_numWeights = "numWeights";
     public static String p_tournamentSize = Tournament.p_tournamentSize;
+    public static String p_extremesElitism = "extremesElitism";
     
     public static String po_distributionIndex = "distributionIndex";
     public static String po_probability = "probability";
-//    public static String p_ = "";
     
     protected Tournament tournmentSelOperator = null;
+    protected boolean useExtremeElitism = false;
     
     /**
      * Constructor
@@ -39,26 +40,24 @@ public abstract class Weips extends Algorithm {
     }
 
     public void build(){
-        tournmentSelOperator = getTournmentSelOperator(problem_.getNumberOfObjectives(),
-                                             ((Integer) getInputParameter(p_numWeights)).intValue());
+        int numberOfObjectives = problem_.getNumberOfObjectives();
+        int numberWeights = (Integer) getInputParameter(p_numWeights);
+        
+        HashMap  parameters = new HashMap();
+        parameters.put(Tournament.p_tournamentSize, (Integer) getInputParameter(p_tournamentSize)) ;
+        parameters.put(Tournament.p_comparator, new WeipsComparator(getWeightMatrix(numberOfObjectives, numberWeights)));
+        
+        tournmentSelOperator = new Tournament(parameters);
+        if(getInputParameter(p_extremesElitism) != null){
+            useExtremeElitism = (Boolean) getInputParameter(p_extremesElitism);
+        }
     }
     
     public abstract String getName();
     
     public abstract String getDescription();
-
-    private Tournament getTournmentSelOperator(int numberOfObjectives, 
-                                            int numberWeights) {
-        HashMap  parameters = new HashMap();
-        parameters.put(Tournament.p_tournamentSize, (Integer) getInputParameter(p_tournamentSize)) ;
-        parameters.put(Tournament.p_comparator, new WeipsComparator(getWeightMatrix(numberOfObjectives, numberWeights)));
-        
-        return new Tournament(parameters);
-    }
     
     protected abstract List<double[]> getWeightMatrix(int numberOfObjectives, int numberWeights);
-    
-    
     
     /**   
      * Runs the WeiPS algorithm.
@@ -134,6 +133,9 @@ public abstract class Weips extends Algorithm {
                     evaluations += 2;
                 }                            
             } 
+            /******************************************************************
+             *                        Replacement Stage                       *
+             ******************************************************************/            
             
             // Create the solutionSet union of solutionSet and offSpring
             union = ((SolutionSet) population).union(offspringPopulation);
@@ -155,12 +157,14 @@ public abstract class Weips extends Algorithm {
                 }
             }
             else if(stricNDS.getNonDominatedSet().size() > populationSize){
-                // Add the extremes of the PF                
-                for(int k = 0; k < remain && k < problem_.getNumberOfObjectives(); k++) {
-                    Solution selected = getBestSolutionAtObjective(stricNDS.getNonDominatedSet(), k);
-                    stricNDS.getNonDominatedSet().remove(selected);
-                    population.add(selected);
-                    remain--;
+                // Add the extremes of the PF (only if useExtremeElitism = true)
+                if(useExtremeElitism){
+                    for(int k = 0; k < remain && k < problem_.getNumberOfObjectives(); k++) {
+                        Solution selected = getBestSolutionAtObjective(stricNDS.getNonDominatedSet(), k);
+                        stricNDS.getNonDominatedSet().remove(selected);
+                        population.add(selected);
+                        remain--;
+                    }
                 }
                 for(int k = 0; k < remain; k++){
                     Solution selected = tournmentSelOperator.noReplacementTournament(stricNDS.getNonDominatedSet());
