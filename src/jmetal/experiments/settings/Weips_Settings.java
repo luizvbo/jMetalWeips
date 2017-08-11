@@ -75,8 +75,8 @@ public class Weips_Settings extends Settings {
         //    populationSize_              = 100   ;
         //    maxEvaluations_              = 25000 ;
 
-        populationSize_ = 300;
-        maxEvaluations_ = 150000;
+        populationSize_              = 100   ;
+        maxEvaluations_              = 25000 ;
 
         mutationProbability_         = 1.0/problem_.getNumberOfVariables() ;
         crossoverProbability_        = 0.9   ;
