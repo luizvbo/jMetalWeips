@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jmetal.metaheuristics.weips.Weips;
 import static jmetal.metaheuristics.weips.WeipsBuilder.fileHandler_;
 import static jmetal.metaheuristics.weips.WeipsBuilder.logger_;
 import jmetal.util.Configuration;
@@ -42,7 +43,7 @@ import jmetal.util.Configuration;
  * compared when solving the ZDT, DTLZ, and WFG benchmarks, and the hypervolume,
  * spread and additive epsilon indicators are used for performance assessment.
  */
-public class Weips2DStudy extends Experiment {
+public class WeipsStudy extends Experiment {
 
     /**
      * Configures the algorithms in each independent run
@@ -67,20 +68,55 @@ public class Weips2DStudy extends Experiment {
                     parameters[i].put("paretoFrontFile_", paretoFrontFile_[problemIndex]);
             } // if
 
-            algorithm[0] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
-            algorithm[1] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
-            algorithm[2] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
-            algorithm[3] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
-            algorithm[4] = new SPEA2_Settings(problemName).configure(parameters[1]);
-            algorithm[5] = new MOCell_Settings(problemName).configure(parameters[2]);
-            algorithm[6] = new SMPSO_Settings(problemName).configure(parameters[3]);
-            algorithm[7] = new GDE3_Settings(problemName).configure(parameters[4]);
+            int index = 0;
+            
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+                        
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
+            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            
+            algorithm[index++] = new NSGAII_Settings(problemName).configure(parameters[0]);
+            algorithm[index++] = new SPEA2_Settings(problemName).configure(parameters[1]);
+            algorithm[index++] = new MOCell_Settings(problemName).configure(parameters[2]);
+            algorithm[index++] = new SMPSO_Settings(problemName).configure(parameters[3]);
+            algorithm[index++] = new GDE3_Settings(problemName).configure(parameters[4]);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(Weips2DStudy.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WeipsStudy.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(Weips2DStudy.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WeipsStudy.class.getName()).log(Level.SEVERE, null, ex);
         } catch  (JMException ex) {
-            Logger.getLogger(Weips2DStudy.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WeipsStudy.class.getName()).log(Level.SEVERE, null, ex);
         }
     } 
 
@@ -104,12 +140,18 @@ public class Weips2DStudy extends Experiment {
         fileHandler_ = new FileHandler(ouputDir + "Weips2DStudy.log"); 
         logger_.addHandler(fileHandler_) ;
 
-        Weips2DStudy exp = new Weips2DStudy();
+        WeipsStudy exp = new WeipsStudy();
 
-        exp.experimentName_ = "Weips2DStudy";
-        exp.algorithmNameList_ = new String[]{"RawPS", "UnPaS", "GriPS", 
-                                              "StratGriPS", "SPEA2", "MOCell", 
-                                              "SMPSO", "GDE3"};
+        exp.experimentName_ = "WeipsStudy";
+        exp.algorithmNameList_ = new String[]{"RawPS-t3", "RawPS-t3-elit", "RawPS-t5", 
+                                              "RawPS-t5-elit", "UnPaS-t3", 
+                                              "UnPaS-t3-elit", "UnPaS-t5", 
+                                              "UnPaS-t5-elit", "GriPS-t3", 
+                                              "GriPS-t3-elit", "GriPS-t5", 
+                                              "GriPS-t5-elit", "StratGriPS-t3", 
+                                              "StratGriPS-t3-elit", "StratGriPS-t5", 
+                                              "StratGriPS-t5-elit", "NSGAII", 
+                                              "SPEA2", "MOCell", "SMPSO", "GDE3"};
         exp.problemList_ = new String[]{"ZDT1", "ZDT2","ZDT3", "ZDT4","ZDT6",
                                         "WFG1","WFG2","WFG3","WFG4", "WFG5", "WFG6",
                                         "WFG7","WFG8","WFG9", "DTLZ1","DTLZ2",
