@@ -122,7 +122,7 @@ public class Weips2DStudy extends Experiment {
                                             "DTLZ2.2D.pf", "DTLZ3.2D.pf","DTLZ4.2D.pf",
                                             "DTLZ5.2D.pf","DTLZ6.2D.pf", "DTLZ7.2D.pf"};
 
-        exp.indicatorList_ = new String[]{"HV", "SPREAD", "EPSILON"};
+        exp.indicatorList_ = new String[]{"HV", "SPREAD", "EPSILON", "TIME"};
 
         int numberOfAlgorithms = exp.algorithmNameList_.length;
 
@@ -136,7 +136,7 @@ public class Weips2DStudy extends Experiment {
         exp.initExperiment();
 
         // Run the experiments
-        int numberOfThreads = Runtime.getRuntime().availableProcessors() * 2;
+        int numberOfThreads = Runtime.getRuntime().availableProcessors();
         exp.runExperiment(numberOfThreads) ;
 
         exp.generateQualityIndicators() ;
@@ -149,7 +149,6 @@ public class Weips2DStudy extends Experiment {
         int columns  ;
         String prefix ;
         String [] problems ;
-        boolean notch ;
 
         // Configuring scripts for ZDT
         rows = 3 ;
@@ -157,7 +156,7 @@ public class Weips2DStudy extends Experiment {
         prefix = new String("ZDT");
         problems = new String[]{"ZDT1", "ZDT2","ZDT3", "ZDT4","ZDT6"} ;
 
-        exp.generateRBoxplotScripts(rows, columns, problems, prefix, notch = false, exp) ;
+        exp.generateRBoxplotScripts(rows, columns, problems, prefix, false, exp) ;
         exp.generateRWilcoxonScripts(problems, prefix, exp) ;
 
         // Configure scripts for DTLZ
@@ -167,7 +166,7 @@ public class Weips2DStudy extends Experiment {
         problems = new String[]{"DTLZ1","DTLZ2","DTLZ3","DTLZ4","DTLZ5",
         "DTLZ6","DTLZ7"} ;
 
-        exp.generateRBoxplotScripts(rows, columns, problems, prefix, notch=false, exp) ;
+        exp.generateRBoxplotScripts(rows, columns, problems, prefix, false, exp) ;
         exp.generateRWilcoxonScripts(problems, prefix, exp) ;
 
         // Configure scripts for WFG
@@ -177,11 +176,12 @@ public class Weips2DStudy extends Experiment {
         problems = new String[]{"WFG1","WFG2","WFG3","WFG4","WFG5","WFG6",
         "WFG7","WFG8","WFG9"} ;
 
-        exp.generateRBoxplotScripts(rows, columns, problems, prefix, notch=false, exp) ;
+        exp.generateRBoxplotScripts(rows, columns, problems, prefix, false, exp) ;
         exp.generateRWilcoxonScripts(problems, prefix, exp) ;
 
         // Applying Friedman test
         Friedman test = new Friedman(exp);
+        test.executeTest("TIME");
         test.executeTest("EPSILON");
         test.executeTest("HV");
         test.executeTest("SPREAD");
