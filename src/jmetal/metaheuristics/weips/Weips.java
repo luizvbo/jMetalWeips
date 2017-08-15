@@ -116,10 +116,13 @@ public abstract class Weips extends Algorithm {
             problem_.evaluateConstraints(newSolution);
             evaluations++;
             population.add(newSolution);
-        } 
-
+        }
+        
         // Generations 
         while (evaluations < maxEvaluations) {
+            
+            // Reset the permutation array used by the tournament operator
+            tournmentSelOperator.resetPermutation(populationSize);
 
             // Create the offSpring solutionSet      
             offspringPopulation = new SolutionSet(populationSize);
@@ -149,39 +152,41 @@ public abstract class Weips extends Algorithm {
             union = ((SolutionSet) population).union(offspringPopulation);
 
             // Ranking the union
-            StrictlyNonDominatedSet stricNDS = new StrictlyNonDominatedSet(union);
+            StrictlyNonDominatedSet strictlyNDS = new StrictlyNonDominatedSet(union);
             
             int remain = populationSize;
             population.clear();
 
-            if(stricNDS.getNonDominatedSet().size() < remain){
-                for(int k = 0; k < stricNDS.getNonDominatedSet().size(); k++) {
-                    population.add(stricNDS.getNonDominatedSet().get(k));
+            if(strictlyNDS.getNonDominatedSet().size() < remain){
+                for(int k = 0; k < strictlyNDS.getNonDominatedSet().size(); k++) {
+                    population.add(strictlyNDS.getNonDominatedSet().get(k));
                 }
-                remain -= stricNDS.getNonDominatedSet().size();
+                remain -= strictlyNDS.getNonDominatedSet().size();
+                tournmentSelOperator.resetPermutation(strictlyNDS.getNonDominatedSet().size());
                 for(int k = 0; k < remain; k++) {
-                    Solution selected = tournmentSelOperator.noReplacementTournament(stricNDS.getDominatedSet());
+                    Solution selected = tournmentSelOperator.noReplacementTournament(strictlyNDS.getDominatedSet());
                     population.add(selected);
                 }
             }
-            else if(stricNDS.getNonDominatedSet().size() > populationSize){
+            else if(strictlyNDS.getNonDominatedSet().size() > populationSize){
                 // Add the extremes of the PF (only if useExtremeElitism = true)
                 if(useExtremeElitism){
                     for(int k = 0; k < remain && k < problem_.getNumberOfObjectives(); k++) {
-                        Solution selected = getBestSolutionAtObjective(stricNDS.getNonDominatedSet(), k);
-                        stricNDS.getNonDominatedSet().remove(selected);
+                        Solution selected = getBestSolutionAtObjective(strictlyNDS.getNonDominatedSet(), k);
+                        strictlyNDS.getNonDominatedSet().remove(selected);
                         population.add(selected);
                         remain--;
                     }
                 }
+                tournmentSelOperator.resetPermutation(strictlyNDS.getNonDominatedSet().size());
                 for(int k = 0; k < remain; k++){
-                    Solution selected = tournmentSelOperator.noReplacementTournament(stricNDS.getNonDominatedSet());
+                    Solution selected = tournmentSelOperator.noReplacementTournament(strictlyNDS.getNonDominatedSet());
                     population.add(selected);
                 }
             }
             else{
-                for(int k = 0; k < stricNDS.getNonDominatedSet().size(); k++) {
-                    population.add(stricNDS.getNonDominatedSet().get(k));
+                for(int k = 0; k < strictlyNDS.getNonDominatedSet().size(); k++) {
+                    population.add(strictlyNDS.getNonDominatedSet().get(k));
                 }
             }
         }

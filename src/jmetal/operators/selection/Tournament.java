@@ -47,8 +47,18 @@ public class Tournament extends Selection {
     /**
      * Defines the size of the tournament
      */
-    private int tournamentSize;
+    private int tournamentSize_;
 
+    /**
+     * a_ stores a permutation of the solutions in the solutionSet used
+     */
+    private int a_[];
+  
+    /**
+     *  index_ stores the actual index for selection
+     */
+    private int index_ = 0;
+    
     /**
      * Constructor
      * Creates a new Binary tournament operator using a BinaryTournamentComparator
@@ -57,14 +67,14 @@ public class Tournament extends Selection {
         super(parameters) ;
         if (parameters != null){
             comparator_ = new DominanceComparator();
-            tournamentSize = 2;
+            tournamentSize_ = 2;
         }
         else{
             if(parameters.get(p_comparator) != null){
                 comparator_ = (Comparator) parameters.get(p_comparator) ;
             }
             if(parameters.get(p_tournamentSize) != null){
-                tournamentSize = ((Integer)parameters.get(p_tournamentSize)).intValue();
+                tournamentSize_ = ((Integer)parameters.get(p_tournamentSize)).intValue();
             }
         }
     } 
@@ -78,7 +88,19 @@ public class Tournament extends Selection {
     @Override
     public Object execute(Object object) throws JMException{
         SolutionSet solutionSet = (SolutionSet)object;
-        SolutionSet candidates = SolutionListUtils.selectNRandomDifferentSolutions(tournamentSize, solutionSet);
+//        if (index_ == 0) { //Create the permutation
+//          a_= (new jmetal.util.PermutationUtility()).intPermutation(solutionSet.size());
+//        }
+        
+        SolutionSet candidates = new SolutionSet(tournamentSize_);
+        while(candidates.size() < tournamentSize_){
+            candidates.add(solutionSet.get(a_[index_]));
+            index_ ++;
+            if(index_ >= solutionSet.size()){
+                index_ = 0;
+                a_= (new jmetal.util.PermutationUtility()).intPermutation(solutionSet.size());
+            }
+        }
         
         if (candidates.size() == 1) {
             return candidates.get(0);
@@ -87,6 +109,11 @@ public class Tournament extends Selection {
         return candidates.best(comparator_);
     } 
     
+    public void resetPermutation(int solSetSize){
+        index_ = 0;
+        a_= (new jmetal.util.PermutationUtility()).intPermutation(solSetSize);
+    }
+       
     /**
      * Selects one solution from the input solution set using a tournament of size 
      * <code>tournamentSize</code> and then remove it from the set
@@ -94,23 +121,31 @@ public class Tournament extends Selection {
      * @return The winner of the tournment
      */
     public Solution noReplacementTournament(List<Solution> solutionList) {
-        int tournamentSize = Math.min(this.tournamentSize, solutionList.size());
+        int tournamentSize = Math.min(tournamentSize_, solutionList.size());
         
-        Integer[] candIndexes = SolutionListUtils.
-                                    selectNRandomDifferentPostions(tournamentSize, solutionList.size()).
-                                    toArray(new Integer[tournamentSize]);
-        
-        if (candIndexes.length == 1) {
-            solutionList.remove((int)candIndexes[0]);
-            return solutionList.get(candIndexes[0]);
+        if (index_ == 0) { //Create the permutation
+          a_= (new jmetal.util.PermutationUtility()).intPermutation(solutionList.size());
         }
         
-        SolutionSet candSolutions = new SolutionSet(tournamentSize);
-        for(int i = 0; i < candIndexes.length; i++){
-            candSolutions.add(solutionList.get(candIndexes[i]));
+        SolutionSet candidates = new SolutionSet(tournamentSize);
+        while(candidates.size() < tournamentSize){
+            if(a_[index_] < solutionList.size())
+                candidates.add(solutionList.get(a_[index_]));
+            if(index_ < solutionList.size()){
+                index_ ++;
+            }
+            else{
+                index_ = 0;
+                a_= (new jmetal.util.PermutationUtility()).intPermutation(solutionList.size());
+            }
+        }
+        
+        if (candidates.size() == 1) {
+            solutionList.remove(candidates.get(0));
+            return candidates.get(0);
         }
                 
-        Solution selectedSol = candSolutions.best(comparator_);
+        Solution selectedSol = candidates.best(comparator_);
         solutionList.remove(selectedSol);
         
         return selectedSol;
