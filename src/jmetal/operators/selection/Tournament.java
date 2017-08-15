@@ -21,7 +21,6 @@
 
 package jmetal.operators.selection;
 
-import java.util.Collection;
 import jmetal.core.SolutionSet;
 import jmetal.util.comparators.DominanceComparator;
 
