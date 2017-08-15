@@ -68,47 +68,92 @@ public class WeipsStudy extends Experiment {
 
             int index = 0;
             
-//            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
-//            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
-//            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
-            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
-            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 2);
-            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[0]);
-            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 2);
-            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            // Rawps t2
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_tournamentSize, 2);
+            // Rawps t2 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[index]);
+            algorithm[index].setInputParameter(Weips.p_tournamentSize, 2);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            // Rawps t3
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[index++]);
+            // Rawps t3 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            // Rawps t5
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_tournamentSize, 5);
+            // Rawps t5 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.RAWPS).configure(parameters[index]);
+            algorithm[index].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
             
-//            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
-//            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
-//            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
-            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
-            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 2);
-            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[0]);
-            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 2);
-            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
-                        
-//            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
-//            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
-//            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
-            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
-            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 2);
-            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[0]);
-            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 2);
-            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            // Unpas t2
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_tournamentSize, 2);
+            // Unpas t2 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[index]);
+            algorithm[index].setInputParameter(Weips.p_tournamentSize, 2);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            // Unpas t3
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[index++]);
+            // Unpas t3 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            // Unpas t5
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_tournamentSize, 5);
+            // Unpas t5 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.UNPAS).configure(parameters[index]);
+            algorithm[index].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
             
-//            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
-//            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
-//            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
-            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
-            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 2);
-            algorithm[index++] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[0]);
-            algorithm[index-1].setInputParameter(Weips.p_tournamentSize, 2);
-            algorithm[index-1].setInputParameter(Weips.p_extremesElitism, true);
+            // Grips t2
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_tournamentSize, 2);
+            // Grips t2 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[index]);
+            algorithm[index].setInputParameter(Weips.p_tournamentSize, 2);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            // Grips t3
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[index++]);
+            // Grips t3 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            // Grips t5
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_tournamentSize, 5);
+            // Grips t5 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.GRIPS).configure(parameters[index]);
+            algorithm[index].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
             
-//            algorithm[index++] = new NSGAII_Settings(problemName).configure(parameters[0]);
-//            algorithm[index++] = new SPEA2_Settings(problemName).configure(parameters[1]);
-//            algorithm[index++] = new MOCell_Settings(problemName).configure(parameters[2]);
-//            algorithm[index++] = new SMPSO_Settings(problemName).configure(parameters[3]);
-//            algorithm[index++] = new GDE3_Settings(problemName).configure(parameters[4]);
+            
+            // Stratgrips t2
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_tournamentSize, 2);
+            // Stratgrips t2 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[index]);
+            algorithm[index].setInputParameter(Weips.p_tournamentSize, 2);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            // Stratgrips t3
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[index++]);
+            // Stratgrips t3 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            // Stratgrips t5
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[index]);
+            algorithm[index++].setInputParameter(Weips.p_tournamentSize, 5);
+            // Stratgrips t5 + elitism
+            algorithm[index] = new Weips_Settings(problemName, Weips_Settings.eWeipsMethod.STRATGRIPS).configure(parameters[index]);
+            algorithm[index].setInputParameter(Weips.p_tournamentSize, 5);
+            algorithm[index++].setInputParameter(Weips.p_extremesElitism, true);
+            
+            algorithm[index] = new NSGAII_Settings(problemName).configure(parameters[index++]);
+            algorithm[index] = new SPEA2_Settings(problemName).configure(parameters[index++]);
+            algorithm[index] = new MOCell_Settings(problemName).configure(parameters[index++]);
+//            algorithm[index] = new SMPSO_Settings(problemName).configure(parameters[index++]);
+            algorithm[index] = new GDE3_Settings(problemName).configure(parameters[index++]);
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(WeipsStudy.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
@@ -141,16 +186,13 @@ public class WeipsStudy extends Experiment {
         WeipsStudy exp = new WeipsStudy();
 
         exp.experimentName_ = "WeipsStudy";
-        exp.algorithmNameList_ = new String[]{"rawpsT2", "rawpsT2el", "unpasT2", "unpasT2el", "gripsT2", "gripsT2el", "sgripsT2", "sgripsT2el",
-//                                              "RawPS-t3", "RawPS-t3-elit", 
-//                                              "UnPaS-t3", "UnPaS-t3-elit",
-//                                              "GriPS-t3", "GriPS-t3-elit",
-//                                              "StratGriPS-t3", "StratGriPS-t3",  
-//                                              "RawPS-t5", "UnPaS-t5", "GriPS-t5", "StratGriPS-t5",
+        exp.algorithmNameList_ = new String[]{"rawpsT2", "rawpsT2el", "rawpsT3", "rawpsT3el", "rawpsT5", 
+                                              "rawpsT5el", "unpasT2", "unpasT2el", "unpasT3", "unpasT3el", 
+                                              "unpasT5", "unpasT5el", "gripsT2", "gripsT2el", "gripsT3", 
+                                              "gripsT3el", "gripsT5", "gripsT5el", "sgripsT2", "sgripsT2el", 
+                                              "sgripsT3", "sgripsT3el", "sgripsT5", "sgripsT5el",
 //                                              "SMPSO",
-                                              "RawPS-t5-elit", "UnPaS-t5-elit",
-                                               "GriPS-t5-elit", "StratGriPS-t5-elit"};
-//                                              "NSGAII", "SPEA2", "MOCell", "GDE3"};
+                                              "NSGAII", "SPEA2", "MOCell", "GDE3"};
         exp.problemList_ = new String[]{
 //                                        "DTLZ3", "DTLZ6",
                                         "ZDT1", "ZDT2","ZDT3", "ZDT4","ZDT6",
@@ -181,11 +223,11 @@ public class WeipsStudy extends Experiment {
         exp.initExperiment();
 
         // Run the experiments
-        int numberOfThreads = Runtime.getRuntime().availableProcessors();
-//        int numberOfThreads = 1;
-//        exp.runExperiment(numberOfThreads) ;
+//        int numberOfThreads = Runtime.getRuntime().availableProcessors();
+        int numberOfThreads = 532;
+        exp.runExperiment(numberOfThreads) ;
 
-//        exp.generateQualityIndicators() ;
+        exp.generateQualityIndicators() ;
 
         // Generate latex tables
         exp.generateLatexTables() ;
