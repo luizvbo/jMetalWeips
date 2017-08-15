@@ -1,14 +1,22 @@
 package jmetal.metaheuristics.weips;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 import jmetal.core.*;
+import jmetal.operators.crossover.CrossoverFactory;
+import jmetal.operators.mutation.MutationFactory;
 import jmetal.operators.selection.Tournament;
+import jmetal.problems.ProblemFactory;
+import jmetal.problems.ZDT.ZDT3;
 import jmetal.qualityIndicator.QualityIndicator;
+import jmetal.util.Configuration;
 import jmetal.util.Distance;
 import jmetal.util.JMException;
 import jmetal.util.Ranking;
-import jmetal.util.StrictNonDominatedSet;
+import jmetal.util.StrictlyNonDominatedSet;
 import jmetal.util.comparators.WeipsComparator;
 
 /**
@@ -141,7 +149,7 @@ public abstract class Weips extends Algorithm {
             union = ((SolutionSet) population).union(offspringPopulation);
 
             // Ranking the union
-            StrictNonDominatedSet stricNDS = new StrictNonDominatedSet(union);
+            StrictlyNonDominatedSet stricNDS = new StrictlyNonDominatedSet(union);
             
             int remain = populationSize;
             population.clear();
@@ -199,4 +207,105 @@ public abstract class Weips extends Algorithm {
         }
         return bestSolution;
     }
+    
+    /**
+     * @param args Command line arguments.
+     * @throws JMException 
+     * @throws IOException 
+     * @throws SecurityException 
+     * Usage: three options
+     *      - jmetal.metaheuristics.weips.Weips
+     *      - jmetal.metaheuristics.weips.Weips problemName
+     *      - jmetal.metaheuristics.weips.Weips problemName paretoFrontFile
+     */
+    public static void main(String [] args) throws JMException, SecurityException, 
+                                                    IOException, ClassNotFoundException {
+        Problem   problem   ; // The problem to solve
+        Algorithm algorithm ; // The algorithm to use
+        Operator  crossover ; // Crossover operator
+        Operator  mutation  ; // Mutation operator
+
+        HashMap  parameters ; // Operator parameters
+
+        QualityIndicator indicators ; // Object to get quality indicators
+
+//        public static Logger      logger_ ;      // Logger object
+//        public static FileHandler fileHandler_ ; // FileHandler object
+        
+        String outputDir = "/tmp/weips/";
+
+        // Logger object and file to store log messages
+        Logger logger      = Configuration.logger_ ;
+        FileHandler fileHandler = new FileHandler(outputDir + "Weips_main.log"); 
+        logger.addHandler(fileHandler) ;
+
+        indicators = null ;
+        if (args.length == 1) {
+            Object [] params = {"Real"};
+            problem = (new ProblemFactory()).getProblem(args[0],params);
+        } // if
+        else if (args.length == 2) {
+            Object [] params = {"Real"};
+            problem = (new ProblemFactory()).getProblem(args[0],params);
+            indicators = new QualityIndicator(problem, args[1]) ;
+        } // if
+        else { // Default problem
+            //problem = new Kursawe("Real", 3);
+            //problem = new Kursawe("BinaryReal", 3);
+            //problem = new Water("Real");
+            problem = new ZDT3("ArrayReal", 30);
+            //problem = new ConstrEx("Real");
+            //problem = new DTLZ1("Real");
+            //problem = new OKA2("Real") ;
+        }
+
+        algorithm = new Rawps(problem);
+
+        // Algorithm parameters
+        algorithm.setInputParameter("populationSize",100);
+        algorithm.setInputParameter("maxEvaluations",25000);
+        algorithm.setInputParameter(Weips.p_numWeights, 100);
+
+        // Mutation and Crossover for Real codification 
+        parameters = new HashMap() ;
+        parameters.put("probability", 0.9) ;
+        parameters.put("distributionIndex", 20.0) ;
+        crossover = CrossoverFactory.getCrossoverOperator("SBXCrossover", parameters);                   
+
+        parameters = new HashMap() ;
+        parameters.put("probability", 1.0/problem.getNumberOfVariables()) ;
+        parameters.put("distributionIndex", 20.0) ;
+        mutation = MutationFactory.getMutationOperator("PolynomialMutation", parameters);                    
+
+        // Add the operators to the algorithm
+        algorithm.addOperator("crossover",crossover);
+        algorithm.addOperator("mutation",mutation);
+
+        // Add the indicator object to the algorithm
+        algorithm.setInputParameter("indicators", indicators) ;
+
+        // Execute the Algorithm
+        long initTime = System.currentTimeMillis();
+        SolutionSet population = algorithm.execute();
+        long estimatedTime = System.currentTimeMillis() - initTime;
+
+        // Result messages 
+        logger.info("Total execution time: "+estimatedTime + "ms");
+        logger.info("Variables values have been writen to file VAR");
+        population.printVariablesToFile(outputDir + "VAR");    
+        logger.info("Objectives values have been writen to file FUN");
+        population.printObjectivesToFile(outputDir + "FUN");
+
+        if (indicators != null) {
+            logger.info("Quality indicators") ;
+            logger.info("Hypervolume: " + indicators.getHypervolume(population)) ;
+            logger.info("GD         : " + indicators.getGD(population)) ;
+            logger.info("IGD        : " + indicators.getIGD(population)) ;
+            logger.info("Spread     : " + indicators.getSpread(population)) ;
+            logger.info("Epsilon    : " + indicators.getEpsilon(population)) ;  
+
+            int evaluations = ((Integer)algorithm.getOutputParameter("evaluations")).intValue();
+            logger.info("Speed      : " + evaluations + " evaluations") ;      
+        } 
+    } 
 }
