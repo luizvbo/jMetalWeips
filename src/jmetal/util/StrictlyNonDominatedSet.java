@@ -40,7 +40,7 @@ import jmetal.core.Solution;
  * solutions, subset 1 contains the non-dominated solutions after removing those
  * belonging to subset 0, and so on.
  */
-public class StrictNonDominatedSet {
+public class StrictlyNonDominatedSet {
     
     // Set of strictly non-dominated solutions
     private List<Solution> nonDominatedSet;
@@ -52,7 +52,7 @@ public class StrictNonDominatedSet {
      * Constructor.
      * @param solutionSet The <code>SolutionSet</code> to be ranked.
      */       
-    public StrictNonDominatedSet(SolutionSet solutionSet) {     
+    public StrictlyNonDominatedSet(SolutionSet solutionSet) {     
         // Comparator for dominance checking
         Comparator dominance_ = new DominanceComparator();
         
