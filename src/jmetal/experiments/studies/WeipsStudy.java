@@ -152,7 +152,7 @@ public class WeipsStudy extends Experiment {
             algorithm[index] = new NSGAII_Settings(problemName).configure(parameters[index++]);
             algorithm[index] = new SPEA2_Settings(problemName).configure(parameters[index++]);
             algorithm[index] = new MOCell_Settings(problemName).configure(parameters[index++]);
-//            algorithm[index] = new SMPSO_Settings(problemName).configure(parameters[index++]);
+            algorithm[index] = new SMPSO_Settings(problemName).configure(parameters[index++]);
             algorithm[index] = new GDE3_Settings(problemName).configure(parameters[index++]);
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(WeipsStudy.class.getName()).log(Level.SEVERE, null, ex);
@@ -186,13 +186,17 @@ public class WeipsStudy extends Experiment {
         WeipsStudy exp = new WeipsStudy();
 
         exp.experimentName_ = "WeipsStudy";
-        exp.algorithmNameList_ = new String[]{"rawpsT2", "rawpsT2el", "rawpsT3", "rawpsT3el", "rawpsT5", 
+        exp.algorithmNameList_ = new String[]{
+//                                              "rawpsT2el", "rawpsT3el", "rawpsT5el", "unpasT2el", "unpasT3el", 
+//                                              "unpasT5el", "gripsT2el", "gripsT3el", "gripsT5el", "sgripsT2el", 
+//                                              "sgripsT3el", "sgripsT5el",  
+                                              "rawpsT2", "rawpsT2el", "rawpsT3", "rawpsT3el", "rawpsT5", 
                                               "rawpsT5el", "unpasT2", "unpasT2el", "unpasT3", "unpasT3el", 
                                               "unpasT5", "unpasT5el", "gripsT2", "gripsT2el", "gripsT3", 
                                               "gripsT3el", "gripsT5", "gripsT5el", "sgripsT2", "sgripsT2el", 
                                               "sgripsT3", "sgripsT3el", "sgripsT5", "sgripsT5el",
-//                                              "SMPSO",
-                                              "NSGAII", "SPEA2", "MOCell", "GDE3"};
+                                              "SMPSO","GDE3",
+                                              "NSGAII", "SPEA2", "MOCell"};
         exp.problemList_ = new String[]{
 //                                        "DTLZ3", "DTLZ6",
                                         "ZDT1", "ZDT2","ZDT3", "ZDT4","ZDT6",
@@ -224,7 +228,7 @@ public class WeipsStudy extends Experiment {
 
         // Run the experiments
 //        int numberOfThreads = Runtime.getRuntime().availableProcessors();
-        int numberOfThreads = 532;
+        int numberOfThreads = 1;
         exp.runExperiment(numberOfThreads) ;
 
         exp.generateQualityIndicators() ;

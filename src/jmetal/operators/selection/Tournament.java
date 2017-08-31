@@ -65,7 +65,7 @@ public class Tournament extends Selection {
      */
     public Tournament(HashMap<String, Object> parameters){
         super(parameters) ;
-        if (parameters != null){
+        if (parameters == null){
             comparator_ = new DominanceComparator();
             tournamentSize_ = 2;
         }
@@ -122,7 +122,7 @@ public class Tournament extends Selection {
      */
     public Solution noReplacementTournament(List<Solution> solutionList) {
         int tournamentSize = Math.min(tournamentSize_, solutionList.size());
-        
+                
         if (index_ == 0) { //Create the permutation
           a_= (new jmetal.util.PermutationUtility()).intPermutation(solutionList.size());
         }
@@ -131,7 +131,8 @@ public class Tournament extends Selection {
         while(candidates.size() < tournamentSize){
             if(a_[index_] < solutionList.size())
                 candidates.add(solutionList.get(a_[index_]));
-            if(index_ < solutionList.size()){
+            
+            if(index_ < solutionList.size() - 1){ // We to account the removal
                 index_ ++;
             }
             else{
